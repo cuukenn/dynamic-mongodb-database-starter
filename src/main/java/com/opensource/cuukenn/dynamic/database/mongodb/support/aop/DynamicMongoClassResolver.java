@@ -73,7 +73,11 @@ public class DynamicMongoClassResolver {
         if (allowedPublicOnly && !Modifier.isPublic(method.getModifiers())) {
             return null;
         }
+        //先从方法上获取，获取不到则从类上获取
         DynamicMongo annotation = AnnotationUtils.getAnnotation(method, DynamicMongo.class);
+        if (annotation == null) {
+            annotation = AnnotationUtils.getAnnotation(method.getDeclaringClass(), DynamicMongo.class);
+        }
         if (annotation == null) {
             return null;
         }
