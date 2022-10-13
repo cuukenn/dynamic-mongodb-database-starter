@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.opensource.cuukenn.dynamic.database.mongodb.DynamicMongoAutoConfiguration
+io.github.cuukenn.dynamic.database.mongodb.DynamicMongoAutoConfiguration
