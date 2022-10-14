@@ -1,19 +1,25 @@
 # 简介
+
 dynamic-mongodb-database-starter是一个基于springboot的快速集成Mongodb多数据源的启动器。
+
 # 特性
+
 - 支持 **切换数据源实例**。
 - 支持 **切换数据库**。
 
 # 使用方法
+
 1. 引入dynamic-mongodb-database-starter。
 
 ```xml
+
 <dependency>
-  <groupId>com.opensource.cuukenn</groupId>
+  <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
   <version>${version}</version>
 </dependency>
 ```
+
 2. 配置数据源。
 
 ```yaml
@@ -48,6 +54,7 @@ spring:
 | @DynamicMongo(instanceId="instanceId",databaseName="databaseName") | instanceId为指定库key,databaseName为库名 |
 
 ```java
+
 @Service
 @DynamicMongo("slave")
 public class UserServiceImpl implements IUserService {
@@ -57,25 +64,26 @@ public class UserServiceImpl implements IUserService {
 
   public List selectAll() {
     //默认实例，默认数据库
-    return  mongoTemplate.xxx();
+    return mongoTemplate.xxx();
   }
-  
+
   @Override
   @DynamicMongo("slave_1")
   public List selectByCondition() {
-      //slave_1实例，默认数据库
-    return  mongoTemplate.xxx();
+    //slave_1实例，默认数据库
+    return mongoTemplate.xxx();
   }
-    
+
   @Override
-  @DynamicMongo(instanceId="slave_1",databaseName="databaseName_1")
+  @DynamicMongo(instanceId = "slave_1", databaseName = "databaseName_1")
   public List selectByCondition() {
     //slave_1实例，databaseName_1数据库
-    return  mongoTemplate.xxx();
+    return mongoTemplate.xxx();
   }
 }
 ```
 
 4. 代码示例
+
 - [码云 Demo](https://gitee.com/cuukenn/open-source-study/tree/master/sample/dynamic-mongodb-demo)
 - [Github Demo](https://github.com/cuukenn/open-source-study/tree/master/sample/dynamic-mongodb-demo)
