@@ -12,7 +12,8 @@ dynamic-mongodb-database-starter是一个基于springboot的快速集成Mongodb�
 1. 引入dynamic-mongodb-database-starter。
 
 ```xml
-
+<!-- 具体发布版本可通过以下地址查询 -->
+<!-- https://mvnrepository.com/artifact/io.github.cuukenn/dynamic-mongodb-database-starter -->
 <dependency>
   <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
@@ -42,7 +43,7 @@ spring:
           #相关配置与原mongo配置一致
 ```
 
-3. 使用  **@DynamicMongo **  切换数据源。
+3. 使用  **@DynamicMongo**  切换数据源。
 
 **@DynamicMongo** 可以注解在方法上或类上，**同时存在就近原则 方法上注解 优先于 类上注解**。
 

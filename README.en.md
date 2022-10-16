@@ -12,7 +12,8 @@ dynamic-mongodb-database-starter is a dynamic mongo database components for Spri
 1. Install dynamic-mongodb-database-starter。
 
 ```xml
-
+<!-- you can find the version in the follow website -->
+<!-- https://mvnrepository.com/artifact/io.github.cuukenn/dynamic-mongodb-database-starter -->
 <dependency>
   <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
@@ -38,7 +39,7 @@ spring:
             xxx: xxx
 ```
 
-3. use  **@DynamicMongo ** to  switch mongo database。
+3. use  **@DynamicMongo** to switch mongo database。
 
 **@DynamicMongo** use in class or method，**method first,class second**。
 
