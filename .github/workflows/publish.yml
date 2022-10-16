@@ -1,0 +1,46 @@
+# 相当于脚本用途的一个声明
+name: Maven Central Repo Deployment
+# 触发脚本的事件  这里为发布release之后触发
+on:
+  release:
+    types: [ released ]
+# 定义一个发行任务
+jobs:
+  publish:
+    # 任务运行的环境
+    runs-on: ubuntu-latest
+    # 任务的步骤
+    steps:
+      # 1. 声明 checkout 仓库代码到工作区
+      - name: Checkout Git Repo
+        uses: actions/checkout@v3
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      # 2. 安装Java 环境 这里会用到的参数就是 Git Action secrets中配置的，
+      - name: Setup JDK
+        id: setup_jdk
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: maven
+          server-id: sonatype
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_TOKEN }}
+          gpg-passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+      # 3. 发布到Maven中央仓库
+      - name: Publish to Maven Central Repo
+        # 这里用到了其他人写的action脚本，详细可以去看他的文档。
+        uses: samuelmeuli/action-maven-publish@v1
+        with:
+          maven_profiles: release
+          gpg_private_key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          gpg_passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          nexus_username: ${{ secrets.OSSRH_USERNAME }}
+          nexus_password: ${{ secrets.OSSRH_TOKEN }}
+          server_id: sonatype
