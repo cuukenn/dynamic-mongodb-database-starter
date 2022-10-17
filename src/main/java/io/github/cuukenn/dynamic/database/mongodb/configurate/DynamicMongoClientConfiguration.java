@@ -2,8 +2,8 @@ package io.github.cuukenn.dynamic.database.mongodb.configurate;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
-import io.github.cuukenn.dynamic.database.mongodb.support.factory.DynamicMongoClientBuilder;
-import io.github.cuukenn.dynamic.database.mongodb.support.factory.DynamicMongoClientFactory;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientBuilder;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientFactory;
 import io.github.cuukenn.dynamic.database.mongodb.support.factory.DynamicMongoDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

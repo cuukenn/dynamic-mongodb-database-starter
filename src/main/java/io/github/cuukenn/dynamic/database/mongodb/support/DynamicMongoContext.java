@@ -1,45 +1,20 @@
 package io.github.cuukenn.dynamic.database.mongodb.support;
 
-import org.springframework.util.StringUtils;
-
 /**
- * 上下文
- *
  * @author changgg
  */
-public class DynamicMongoContext {
+public interface DynamicMongoContext {
     /**
-     * 实例ID
+     * 获取实例ID
+     *
+     * @return 实例ID
      */
-    private final String instanceId;
+    String getInstanceId();
+
     /**
-     * 库名
+     * 获取库名
+     *
+     * @return 库名
      */
-    private final String databaseName;
-
-    public DynamicMongoContext() {
-        this.instanceId = "";
-        this.databaseName = "";
-    }
-
-    public DynamicMongoContext(String instanceId, String databaseName) {
-        this.instanceId = StringUtils.hasText(instanceId) ? instanceId : "";
-        this.databaseName = StringUtils.hasText(databaseName) ? databaseName : "";
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    @Override
-    public String toString() {
-        return "DynamicMongoContext{" +
-            "instanceId='" + instanceId + '\'' +
-            ", databaseName='" + databaseName + '\'' +
-            '}';
-    }
+    String getDatabase();
 }
