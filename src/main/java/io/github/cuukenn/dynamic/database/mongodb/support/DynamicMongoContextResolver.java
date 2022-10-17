@@ -1,7 +1,5 @@
 package io.github.cuukenn.dynamic.database.mongodb.support;
 
-import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoContext;
-
 import java.lang.reflect.Method;
 
 /**

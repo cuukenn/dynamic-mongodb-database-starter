@@ -1,6 +1,6 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.aop;
 
-import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
 import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoDatabaseContextHolder;
 import org.aopalliance.intercept.MethodInterceptor;

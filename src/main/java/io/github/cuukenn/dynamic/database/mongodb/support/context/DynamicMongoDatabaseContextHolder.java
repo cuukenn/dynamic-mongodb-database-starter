@@ -1,6 +1,7 @@
 
 package io.github.cuukenn.dynamic.database.mongodb.support.context;
 
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import org.springframework.core.NamedThreadLocal;
 
 import java.util.ArrayDeque;
@@ -51,7 +52,7 @@ public final class DynamicMongoDatabaseContextHolder {
      */
     public static DynamicMongoContext push(DynamicMongoContext context) {
         if (context == null) {
-            context = new DynamicMongoContext();
+            context = new DefaultDynamicMongoContext();
         }
         LOOKUP_KEY_HOLDER.get().push(context);
         return context;

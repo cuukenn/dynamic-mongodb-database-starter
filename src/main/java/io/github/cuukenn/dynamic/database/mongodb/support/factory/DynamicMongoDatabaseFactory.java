@@ -3,7 +3,7 @@ package io.github.cuukenn.dynamic.database.mongodb.support.factory;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientFactory;
-import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoDatabaseContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DynamicMongoDatabaseFactory extends SimpleMongoClientDatabaseFactor
     @Override
     public MongoDatabase getMongoDatabase() throws DataAccessException {
         final DynamicMongoContext context = getContext();
-        return StringUtils.hasText(context.getDatabaseName()) ? getMongoDatabase(context.getDatabaseName()) : super.getMongoDatabase();
+        return StringUtils.hasText(context.getDatabase()) ? getMongoDatabase(context.getDatabase()) : super.getMongoDatabase();
     }
 
     protected DynamicMongoContext getContext() {
