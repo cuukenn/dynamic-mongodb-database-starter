@@ -66,8 +66,8 @@
   </developers>
   <scm>
     <connection>scm:git:git@github.com:cuukenn/dynamic-mongodb-database-starter.git</connection>
-    <developerConnection>scm:git@github.com:cuukenn/dynamic-mongodb-database-starter.git</developerConnection>
-    <url>git@github.com:cuukenn/dynamic-mongodb-database-starter.git</url>
+    <developerConnection>scm:git:git@github.com:cuukenn/dynamic-mongodb-database-starter.git</developerConnection>
+    <url>https://github.com/cuukenn/dynamic-mongodb-database-starter</url>
   </scm>
   <issueManagement>
     <system>Github Issue</system>
