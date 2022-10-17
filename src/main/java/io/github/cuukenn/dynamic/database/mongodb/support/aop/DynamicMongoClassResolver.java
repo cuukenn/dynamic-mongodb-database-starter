@@ -1,6 +1,8 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.aop;
 
-import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongo;
+import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
 import org.springframework.core.MethodClassKey;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -14,7 +16,7 @@ import java.util.Map;
  *
  * @author changgg
  */
-public class DynamicMongoClassResolver {
+public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
     /**
      * 缓存方法对应的数据源
      */
@@ -30,14 +32,8 @@ public class DynamicMongoClassResolver {
         this.allowedPublicOnly = allowedPublicOnly;
     }
 
-    /**
-     * 从缓存获取数据
-     *
-     * @param method       方法
-     * @param targetObject 目标对象
-     * @return ds
-     */
-    public DynamicMongoContext findKey(Method method, Object targetObject) {
+    @Override
+    public DynamicMongoContext resolve(Method method, Object targetObject) {
         if (method.getDeclaringClass() == Object.class) {
             return new DynamicMongoContext();
         }

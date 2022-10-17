@@ -1,4 +1,4 @@
-package io.github.cuukenn.dynamic.database.mongodb.support.factory;
+package io.github.cuukenn.dynamic.database.mongodb.support;
 
 import com.mongodb.client.MongoClient;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;

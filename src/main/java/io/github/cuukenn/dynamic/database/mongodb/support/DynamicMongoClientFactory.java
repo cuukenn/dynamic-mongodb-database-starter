@@ -1,4 +1,4 @@
-package io.github.cuukenn.dynamic.database.mongodb.support.factory;
+package io.github.cuukenn.dynamic.database.mongodb.support;
 
 import com.mongodb.client.MongoClient;
 

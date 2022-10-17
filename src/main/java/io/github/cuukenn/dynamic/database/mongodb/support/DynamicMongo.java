@@ -1,4 +1,4 @@
-package io.github.cuukenn.dynamic.database.mongodb.support.aop;
+package io.github.cuukenn.dynamic.database.mongodb.support;
 
 import org.springframework.core.annotation.AliasFor;
 

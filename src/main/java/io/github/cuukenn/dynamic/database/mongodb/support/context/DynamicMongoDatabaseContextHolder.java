@@ -1,7 +1,6 @@
 
-package io.github.cuukenn.dynamic.database.mongodb.support.toolkit;
+package io.github.cuukenn.dynamic.database.mongodb.support.context;
 
-import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import org.springframework.core.NamedThreadLocal;
 
 import java.util.ArrayDeque;

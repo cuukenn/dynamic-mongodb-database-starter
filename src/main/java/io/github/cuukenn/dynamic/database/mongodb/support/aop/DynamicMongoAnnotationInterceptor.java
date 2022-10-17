@@ -1,7 +1,8 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.aop;
 
-import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
-import io.github.cuukenn.dynamic.database.mongodb.support.toolkit.DynamicMongoDatabaseContextHolder;
+import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
+import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoDatabaseContextHolder;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
@@ -12,10 +13,10 @@ import org.slf4j.LoggerFactory;
  */
 public class DynamicMongoAnnotationInterceptor implements MethodInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(DynamicMongoAnnotationInterceptor.class);
-    private final DynamicMongoClassResolver resolver;
+    private final DynamicMongoContextResolver resolver;
 
-    public DynamicMongoAnnotationInterceptor(Boolean allowedPublicOnly) {
-        this.resolver = new DynamicMongoClassResolver(allowedPublicOnly);
+    public DynamicMongoAnnotationInterceptor(DynamicMongoContextResolver resolver) {
+        this.resolver = resolver;
     }
 
     @Override
@@ -32,6 +33,6 @@ public class DynamicMongoAnnotationInterceptor implements MethodInterceptor {
     }
 
     private DynamicMongoContext determineDatabaseInstance(MethodInvocation invocation) {
-        return resolver.findKey(invocation.getMethod(), invocation.getThis());
+        return resolver.resolve(invocation.getMethod(), invocation.getThis());
     }
 }
