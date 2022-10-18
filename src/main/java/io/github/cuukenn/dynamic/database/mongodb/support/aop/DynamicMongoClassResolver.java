@@ -4,6 +4,8 @@ import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongo;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
 import io.github.cuukenn.dynamic.database.mongodb.support.context.DefaultDynamicMongoContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodClassKey;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -18,11 +20,13 @@ import java.util.Map;
  * @author changgg
  */
 public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
+    private static final Logger log = LoggerFactory.getLogger(DynamicMongoClassResolver.class);
     /**
      * 缓存方法对应的数据源
      */
     private final Map<Object, DynamicMongoContext> contextCache = new HashMap<>();
     private final boolean allowedPublicOnly;
+    private final Object lock = new Object();
 
     /**
      * 加入扩展, 给外部一个修改aop条件的机会
@@ -35,18 +39,31 @@ public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
 
     @Override
     public DynamicMongoContext resolve(Method method, Object targetObject) {
+        final boolean isDebugEnabled = log.isDebugEnabled();
         if (method.getDeclaringClass() == Object.class) {
+            if (isDebugEnabled) {
+                log.debug("the method belongs to Object class,skip it");
+            }
             return new DefaultDynamicMongoContext();
         }
         Object cacheKey = new MethodClassKey(method, targetObject.getClass());
         DynamicMongoContext context = this.contextCache.get(cacheKey);
         if (context == null) {
-            synchronized (DynamicMongoClassResolver.class) {
+            if (isDebugEnabled) {
+                log.debug("not found in cache try second lock");
+            }
+            synchronized (lock) {
                 context = this.contextCache.get(cacheKey);
                 if (context == null) {
-                    context = computeContext(method);
+                    context = resolveContext(method);
                     if (context == null) {
+                        if (isDebugEnabled) {
+                            log.debug("cant not resolve the context,just create default");
+                        }
                         context = new DefaultDynamicMongoContext();
+                    }
+                    if (isDebugEnabled) {
+                        log.debug("cache context:{}", context);
                     }
                     this.contextCache.put(cacheKey, context);
                 }
@@ -65,7 +82,7 @@ public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
      * @param method 方法
      * @return context
      */
-    private DynamicMongoContext computeContext(Method method) {
+    protected DynamicMongoContext resolveContext(Method method) {
         if (allowedPublicOnly && !Modifier.isPublic(method.getModifiers())) {
             return null;
         }

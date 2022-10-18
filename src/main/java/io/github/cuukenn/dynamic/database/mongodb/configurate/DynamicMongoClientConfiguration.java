@@ -31,7 +31,7 @@ public class DynamicMongoClientConfiguration {
     private final Logger logger = LoggerFactory.getLogger(DynamicMongoClientConfiguration.class);
 
     @Bean
-    @ConditionalOnMissingBean(MongoDatabaseFactory.class)
+    @ConditionalOnMissingBean
     public MongoDatabaseFactory mongoClientFactory(MongoClient mongoClient, MongoProperties properties,
                                                    DynamicMongoClientFactory dynamicMongoClientFactory) {
         logger.info("register dynamic mongo database factory");
@@ -39,7 +39,7 @@ public class DynamicMongoClientConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(DynamicMongoClientBuilder.class)
+    @ConditionalOnMissingBean
     public DynamicMongoClientBuilder dynamicMongoClientBuilder(ApplicationContext applicationContext) {
         logger.info("register dynamic mongo client builder");
         return properties -> {
