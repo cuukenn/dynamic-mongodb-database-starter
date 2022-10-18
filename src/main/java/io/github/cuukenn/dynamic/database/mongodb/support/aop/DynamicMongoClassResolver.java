@@ -1,6 +1,11 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.aop;
 
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongo;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
+import io.github.cuukenn.dynamic.database.mongodb.support.context.DefaultDynamicMongoContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodClassKey;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -14,12 +19,14 @@ import java.util.Map;
  *
  * @author changgg
  */
-public class DynamicMongoClassResolver {
+public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
+    private static final Logger log = LoggerFactory.getLogger(DynamicMongoClassResolver.class);
     /**
      * 缓存方法对应的数据源
      */
-    private final Map<Object, DynamicMongoContext> dsCache = new HashMap<>();
+    private final Map<Object, DynamicMongoContext> contextCache = new HashMap<>();
     private final boolean allowedPublicOnly;
+    private final Object lock = new Object();
 
     /**
      * 加入扩展, 给外部一个修改aop条件的机会
@@ -30,28 +37,35 @@ public class DynamicMongoClassResolver {
         this.allowedPublicOnly = allowedPublicOnly;
     }
 
-    /**
-     * 从缓存获取数据
-     *
-     * @param method       方法
-     * @param targetObject 目标对象
-     * @return ds
-     */
-    public DynamicMongoContext findKey(Method method, Object targetObject) {
+    @Override
+    public DynamicMongoContext resolve(Method method, Object targetObject) {
+        final boolean isDebugEnabled = log.isDebugEnabled();
         if (method.getDeclaringClass() == Object.class) {
-            return new DynamicMongoContext();
+            if (isDebugEnabled) {
+                log.debug("the method belongs to Object class,skip it");
+            }
+            return new DefaultDynamicMongoContext();
         }
         Object cacheKey = new MethodClassKey(method, targetObject.getClass());
-        DynamicMongoContext context = this.dsCache.get(cacheKey);
+        DynamicMongoContext context = this.contextCache.get(cacheKey);
         if (context == null) {
-            synchronized (DynamicMongoClassResolver.class) {
-                context = this.dsCache.get(cacheKey);
+            if (isDebugEnabled) {
+                log.debug("not found in cache try second lock");
+            }
+            synchronized (lock) {
+                context = this.contextCache.get(cacheKey);
                 if (context == null) {
-                    context = computeContext(method, targetObject);
+                    context = resolveContext(method);
                     if (context == null) {
-                        context = new DynamicMongoContext();
+                        if (isDebugEnabled) {
+                            log.debug("cant not resolve the context,just create default");
+                        }
+                        context = new DefaultDynamicMongoContext();
                     }
-                    this.dsCache.put(cacheKey, context);
+                    if (isDebugEnabled) {
+                        log.debug("cache context:{}", context);
+                    }
+                    this.contextCache.put(cacheKey, context);
                 }
             }
         }
@@ -65,11 +79,10 @@ public class DynamicMongoClassResolver {
      * 3. 当前类开始一直找到Object
      * 4. 支持mybatis-plus, mybatis-spring
      *
-     * @param method       方法
-     * @param targetObject 目标对象
+     * @param method 方法
      * @return context
      */
-    private DynamicMongoContext computeContext(Method method, Object targetObject) {
+    protected DynamicMongoContext resolveContext(Method method) {
         if (allowedPublicOnly && !Modifier.isPublic(method.getModifiers())) {
             return null;
         }
@@ -81,6 +94,6 @@ public class DynamicMongoClassResolver {
         if (annotation == null) {
             return null;
         }
-        return new DynamicMongoContext(annotation.instanceId(), annotation.databaseName());
+        return new DefaultDynamicMongoContext(annotation.instanceId(), annotation.databaseName());
     }
 }

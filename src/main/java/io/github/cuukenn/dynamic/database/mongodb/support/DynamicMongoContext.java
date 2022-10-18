@@ -1,45 +1,31 @@
 package io.github.cuukenn.dynamic.database.mongodb.support;
 
-import org.springframework.util.StringUtils;
+import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * 上下文
- *
  * @author changgg
  */
-public class DynamicMongoContext {
+public interface DynamicMongoContext {
     /**
-     * 实例ID
+     * 数值转化处理器
+     *
+     * @param invocation  函数上下文
+     * @param valueParser 执行器
      */
-    private final String instanceId;
+    default void parseValue(MethodInvocation invocation, DynamicContextValueParser valueParser) {
+    }
+
     /**
-     * 库名
+     * 获取实例ID
+     *
+     * @return 实例ID
      */
-    private final String databaseName;
+    String getInstanceId();
 
-    public DynamicMongoContext() {
-        this.instanceId = "";
-        this.databaseName = "";
-    }
-
-    public DynamicMongoContext(String instanceId, String databaseName) {
-        this.instanceId = StringUtils.hasText(instanceId) ? instanceId : "";
-        this.databaseName = StringUtils.hasText(databaseName) ? databaseName : "";
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    @Override
-    public String toString() {
-        return "DynamicMongoContext{" +
-            "instanceId='" + instanceId + '\'' +
-            ", databaseName='" + databaseName + '\'' +
-            '}';
-    }
+    /**
+     * 获取库名
+     *
+     * @return 库名
+     */
+    String getDatabase();
 }

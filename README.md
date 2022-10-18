@@ -6,6 +6,9 @@ dynamic-mongodb-database-starter是一个基于springboot的快速集成Mongodb�
 
 - 支持 **切换数据源实例**。
 - 支持 **切换数据库**。
+- 支持 **SpEL表达式获取instanceId和database**。
+- 支持 **session获取instanceId和database**。
+- 支持 **request header获取instanceId和database**。
 
 # 使用方法
 
@@ -17,7 +20,7 @@ dynamic-mongodb-database-starter是一个基于springboot的快速集成Mongodb�
 <dependency>
   <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
-  <version>${version}</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
