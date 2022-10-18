@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <description>Mongo database extension component for springboot to switch mongoTemplate in runtime</description>
   <url>https://github.com/cuukenn/dynamic-mongodb-database-starter</url>
   <packaging>jar</packaging>
