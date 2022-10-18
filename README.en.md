@@ -6,6 +6,9 @@ dynamic-mongodb-database-starter is a dynamic mongo database components for Spri
 
 - Support **dynamic mongo instance**。
 - Support **dynamic mongo database**。
+- Support **read instanceId and database by SpEL**。
+- Support **read instanceId and database from Session**。
+- Support **read instanceId and database from request Header**。
 
 # How to use it
 
@@ -17,7 +20,7 @@ dynamic-mongodb-database-starter is a dynamic mongo database components for Spri
 <dependency>
   <groupId>io.github.cuukenn</groupId>
   <artifactId>dynamic-mongodb-database-starter</artifactId>
-  <version>${version}</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
