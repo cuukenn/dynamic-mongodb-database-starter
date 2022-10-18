@@ -27,7 +27,7 @@ public abstract class AbstractDynamicMongoDatabaseFactory extends SimpleMongoCli
     @Override
     protected MongoClient getMongoClient() {
         final DynamicMongoContext context = getContext();
-        final MongoClient client = StringUtils.hasText(context.getInstanceId()) ? this.dynamicMongoClientFactory.getDynamicMongoClient(context.getInstanceId()) : super.getMongoClient();
+        final MongoClient client = context != null && StringUtils.hasText(context.getInstanceId()) ? this.dynamicMongoClientFactory.getDynamicMongoClient(context.getInstanceId()) : super.getMongoClient();
         Assert.notNull(client, "no dynamic mongo database instance found for " + context);
         return client;
     }
@@ -35,13 +35,13 @@ public abstract class AbstractDynamicMongoDatabaseFactory extends SimpleMongoCli
     @Override
     public MongoDatabase getMongoDatabase() throws DataAccessException {
         final DynamicMongoContext context = getContext();
-        return StringUtils.hasText(context.getDatabase()) ? getMongoDatabase(context.getDatabase()) : super.getMongoDatabase();
+        return context != null && StringUtils.hasText(context.getDatabase()) ? getMongoDatabase(context.getDatabase()) : super.getMongoDatabase();
     }
 
     protected DynamicMongoContext getContext() {
         final DynamicMongoContext context = DynamicMongoDatabaseContextHolder.peek();
         if (logger.isDebugEnabled()) {
-            logger.debug("excepted dynamic mongodb instance is [{}],use default mongo client:[{}]", context, !StringUtils.hasText(context.getInstanceId()));
+            logger.debug("excepted dynamic mongodb instance is [{}],use default mongo client:[{}]", context, context != null && !StringUtils.hasText(context.getInstanceId()));
         }
         return context;
     }

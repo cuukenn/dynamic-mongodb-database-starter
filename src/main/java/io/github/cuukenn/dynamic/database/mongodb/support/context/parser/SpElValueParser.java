@@ -5,8 +5,10 @@ import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.BeanResolver;
+import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -26,25 +28,8 @@ public class SpElValueParser extends AbstractChainValueParser {
     private static final ExpressionParser PARSER = new SpelExpressionParser();
     /**
      * 解析上下文的模板
-     * 对于默认不设置的情况下,从参数中取值的方式 #param1
      */
-    private ParserContext parserContext = new ParserContext() {
-
-        @Override
-        public boolean isTemplate() {
-            return false;
-        }
-
-        @Override
-        public String getExpressionPrefix() {
-            return null;
-        }
-
-        @Override
-        public String getExpressionSuffix() {
-            return null;
-        }
-    };
+    private ParserContext parserContext = new TemplateParserContext();
     private BeanResolver beanResolver;
 
     @Override
@@ -59,7 +44,13 @@ public class SpElValueParser extends AbstractChainValueParser {
         ExpressionRootObject rootObject = new ExpressionRootObject(method, arguments, invocation.getThis());
         StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, arguments, NAME_DISCOVERER);
         context.setBeanResolver(beanResolver);
-        final Object value = PARSER.parseExpression(key, parserContext).getValue(context);
+        Expression expression;
+        if (parserContext != null) {
+            expression = PARSER.parseExpression(key, parserContext);
+        } else {
+            expression = PARSER.parseExpression(key);
+        }
+        final Object value = expression.getValue(context);
         return value == null ? null : value.toString();
     }
 
