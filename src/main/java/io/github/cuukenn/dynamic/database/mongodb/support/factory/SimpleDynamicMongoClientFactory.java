@@ -42,7 +42,7 @@ public class SimpleDynamicMongoClientFactory implements DynamicMongoClientFactor
         dynamicMongoClients = new HashMap<>(config.size());
         for (Map.Entry<String, MongoProperties> entry : config.entrySet()) {
             logger.info("init dynamic mongo database for {}", entry.getKey());
-            dynamicMongoClients.put(entry.getKey(), mongoClientBuilder.build(entry.getValue()));
+            dynamicMongoClients.put(entry.getKey(), mongoClientBuilder.build(entry.getKey(), entry.getValue()));
         }
     }
 
