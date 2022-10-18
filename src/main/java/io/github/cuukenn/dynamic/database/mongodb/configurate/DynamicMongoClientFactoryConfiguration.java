@@ -18,7 +18,7 @@ public class DynamicMongoClientFactoryConfiguration {
     private final Logger logger = LoggerFactory.getLogger(DynamicMongoClientFactoryConfiguration.class);
 
     @Bean
-    @ConditionalOnMissingBean(DynamicMongoClientFactory.class)
+    @ConditionalOnMissingBean
     public DynamicMongoClientFactory dynamicMongoClientHolder(DynamicMongodbProperties properties, DynamicMongoClientBuilder mongoClientBuilder) {
         logger.info("register simple dynamic mongo client factory");
         return new SimpleDynamicMongoClientFactory(properties, mongoClientBuilder);

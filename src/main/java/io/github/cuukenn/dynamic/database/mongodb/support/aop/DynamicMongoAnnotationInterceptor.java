@@ -1,5 +1,6 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.aop;
 
+import io.github.cuukenn.dynamic.database.mongodb.support.DynamicContextValueParser;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
 import io.github.cuukenn.dynamic.database.mongodb.support.context.DynamicMongoDatabaseContextHolder;
@@ -14,9 +15,11 @@ import org.slf4j.LoggerFactory;
 public class DynamicMongoAnnotationInterceptor implements MethodInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(DynamicMongoAnnotationInterceptor.class);
     private final DynamicMongoContextResolver resolver;
+    private final DynamicContextValueParser valueParser;
 
-    public DynamicMongoAnnotationInterceptor(DynamicMongoContextResolver resolver) {
+    public DynamicMongoAnnotationInterceptor(DynamicMongoContextResolver resolver, DynamicContextValueParser valueParser) {
         this.resolver = resolver;
+        this.valueParser = valueParser;
     }
 
     @Override
@@ -33,6 +36,10 @@ public class DynamicMongoAnnotationInterceptor implements MethodInterceptor {
     }
 
     private DynamicMongoContext determineDatabaseInstance(MethodInvocation invocation) {
-        return resolver.resolve(invocation.getMethod(), invocation.getThis());
+        DynamicMongoContext context = resolver.resolve(invocation.getMethod(), invocation.getThis());
+        if (context != null) {
+            context.parseValue(invocation, valueParser);
+        }
+        return context;
     }
 }
