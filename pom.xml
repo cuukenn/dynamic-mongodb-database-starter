@@ -59,7 +59,8 @@
   <licenses>
     <license>
       <name>The MIT License (MIT)</name>
-      <url>https://github.com/cuukenn/dynamic-mongodb-database-starter/blob/master/LICENSE</url>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
   <developers>
