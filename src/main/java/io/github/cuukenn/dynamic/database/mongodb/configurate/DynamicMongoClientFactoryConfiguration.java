@@ -1,6 +1,6 @@
 package io.github.cuukenn.dynamic.database.mongodb.configurate;
 
-import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongodbProperties;
+import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongoProperties;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientBuilder;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientFactory;
 import io.github.cuukenn.dynamic.database.mongodb.support.factory.SimpleDynamicMongoClientFactory;
@@ -19,7 +19,7 @@ public class DynamicMongoClientFactoryConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DynamicMongoClientFactory dynamicMongoClientHolder(DynamicMongodbProperties properties, DynamicMongoClientBuilder mongoClientBuilder) {
+    public DynamicMongoClientFactory dynamicMongoClientHolder(DynamicMongoProperties properties, DynamicMongoClientBuilder mongoClientBuilder) {
         logger.info("register simple dynamic mongo client factory");
         return new SimpleDynamicMongoClientFactory(properties, mongoClientBuilder);
     }

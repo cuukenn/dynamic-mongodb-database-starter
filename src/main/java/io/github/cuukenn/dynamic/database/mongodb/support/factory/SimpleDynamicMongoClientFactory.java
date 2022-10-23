@@ -1,7 +1,7 @@
 package io.github.cuukenn.dynamic.database.mongodb.support.factory;
 
 import com.mongodb.client.MongoClient;
-import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongodbProperties;
+import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongoProperties;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientBuilder;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoClientFactory;
 import org.slf4j.Logger;
@@ -18,11 +18,11 @@ import java.util.Map;
  */
 public class SimpleDynamicMongoClientFactory implements DynamicMongoClientFactory, InitializingBean, DisposableBean {
     private final Logger logger = LoggerFactory.getLogger(SimpleDynamicMongoClientFactory.class);
-    private final DynamicMongodbProperties properties;
+    private final DynamicMongoProperties properties;
     private final DynamicMongoClientBuilder mongoClientBuilder;
     private Map<String, MongoClient> dynamicMongoClients;
 
-    public SimpleDynamicMongoClientFactory(DynamicMongodbProperties properties, DynamicMongoClientBuilder mongoClientBuilder) {
+    public SimpleDynamicMongoClientFactory(DynamicMongoProperties properties, DynamicMongoClientBuilder mongoClientBuilder) {
         this.properties = properties;
         this.mongoClientBuilder = mongoClientBuilder;
     }
