@@ -1,7 +1,7 @@
 package io.github.cuukenn.dynamic.database.mongodb.configurate;
 
 import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongoAopProperties;
-import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongodbProperties;
+import io.github.cuukenn.dynamic.database.mongodb.properties.DynamicMongoProperties;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicContextValueParser;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongo;
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContextResolver;
@@ -32,7 +32,7 @@ public class DynamicMongoAopConfiguration {
 
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     @Bean
-    public Advisor dynamicMongoClientAnnotationAdvisor(DynamicMongodbProperties properties, DynamicMongoContextResolver resolver, DynamicContextValueParser valueParser) {
+    public Advisor dynamicMongoClientAnnotationAdvisor(DynamicMongoProperties properties, DynamicMongoContextResolver resolver, DynamicContextValueParser valueParser) {
         logger.info("register dynamic mongo client aop");
         DynamicMongoAopProperties aopProperties = properties.getAop();
         DynamicMongoAnnotationInterceptor interceptor = new DynamicMongoAnnotationInterceptor(resolver, valueParser);
@@ -43,7 +43,7 @@ public class DynamicMongoAopConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DynamicMongoContextResolver dynamicMongoClassResolver(DynamicMongodbProperties properties) {
+    public DynamicMongoContextResolver dynamicMongoClassResolver(DynamicMongoProperties properties) {
         logger.info("register dynamic mongo context resolver");
         return new DynamicMongoClassResolver(properties.getAop().getAllowedPublicOnly());
     }
