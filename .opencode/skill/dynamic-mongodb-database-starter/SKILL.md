@@ -81,7 +81,7 @@ META-INF/spring.factories + AutoConfiguration.imports（双注册，改类名必
 
 - `DynamicMongoAnnotationAdvisor`：点cut = `AnnotationMatchingPointcut(类)` ∪ 方法级匹配（含接口桥接方法场景）。
 - `DynamicMongoAnnotationInterceptor`：push → proceed → finally poll（栈式，支持嵌套切换）。
-- `DynamicMongoClassResolver`：`allowedPublicOnly=true` 时非 public 方法直接跳过；`MethodClassKey` 缓存解析结果——**改注解解析逻辑注意缓存不失效问题**（缓存随 Bean 生命周期常驻）。
+- `DynamicMongoClassResolver`：`allowedPublicOnly=true` 时非 public 方法直接跳过；`MethodClassKey` 缓存注解**原始表达式**，每次 `resolve` 返回**独立副本**——`parseValue` 只允许改写副本，绝不能把解析结果写回共享缓存（否则动态取值只在首次调用生效）。
 
 ## 模块：`support.context` + `support.context.parser` 上下文与取值链
 
@@ -99,7 +99,7 @@ META-INF/spring.factories + AutoConfiguration.imports（双注册，改类名必
 
 ## 模块：`support.factory` 客户端工厂
 
-- `SimpleDynamicMongoClientFactory`：启动时（`afterPropertiesSet`）按 `dynamic.config` **全量预构建**所有 MongoClient（非懒加载，无配置仅 warn）；`destroy()` 逐个关闭（吞 RuntimeException 只打日志）。
+- `SimpleDynamicMongoClientFactory`：启动时（`afterPropertiesSet`）按 `dynamic.config` **全量预构建**所有 MongoClient（非懒加载，无配置仅 warn）；`destroy()` 无配置时直接跳过、有配置则逐个关闭（吞 RuntimeException 只打日志）。
 - `AbstractDynamicMongoDatabaseFactory`（继承 Boot 的 `SimpleMongoClientDatabaseFactory`）：重写 `getMongoClient()`/`getMongoDatabase()` 实现切换——peek 栈顶上下文，instanceId 非空从动态工厂取，否则回落默认客户端；database 非空则切库。
 - **改动注意**：加"懒加载/动态刷新"需求改这里（`SimpleDynamicMongoClientFactory` 的 Map 策略 + 生命周期）。
 

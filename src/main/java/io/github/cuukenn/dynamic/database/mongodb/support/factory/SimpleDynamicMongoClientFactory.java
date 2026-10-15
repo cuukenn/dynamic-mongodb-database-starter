@@ -48,6 +48,9 @@ public class SimpleDynamicMongoClientFactory implements DynamicMongoClientFactor
 
     @Override
     public void destroy() throws Exception {
+        if (dynamicMongoClients == null) {
+            return;
+        }
         for (Map.Entry<String, MongoClient> entry : dynamicMongoClients.entrySet()) {
             logger.info("closing dynamic mongo client for name:{} ...", entry.getKey());
             try {

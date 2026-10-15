@@ -11,8 +11,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据源解析器
@@ -22,9 +22,9 @@ import java.util.Map;
 public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
     private static final Logger log = LoggerFactory.getLogger(DynamicMongoClassResolver.class);
     /**
-     * 缓存方法对应的数据源
+     * 缓存方法对应的注解原始表达式（不可变使用：只写入、对外返回副本）
      */
-    private final Map<Object, DynamicMongoContext> contextCache = new HashMap<>();
+    private final Map<Object, DynamicMongoContext> contextCache = new ConcurrentHashMap<>();
     private final boolean allowedPublicOnly;
     private final Object lock = new Object();
 
@@ -69,7 +69,9 @@ public class DynamicMongoClassResolver implements DynamicMongoContextResolver {
                 }
             }
         }
-        return context;
+        //缓存只保存注解的原始表达式; 每次返回独立副本,
+        //防止 parseValue 原地改写导致缓存污染(动态取值只在首次生效)及并发调用互相覆盖
+        return new DefaultDynamicMongoContext(context.getInstanceId(), context.getDatabase());
     }
 
     /**
