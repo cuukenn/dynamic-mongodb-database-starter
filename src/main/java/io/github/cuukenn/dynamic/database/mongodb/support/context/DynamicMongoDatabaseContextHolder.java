@@ -3,9 +3,14 @@ package io.github.cuukenn.dynamic.database.mongodb.support.context;
 
 import io.github.cuukenn.dynamic.database.mongodb.support.DynamicMongoContext;
 import org.springframework.core.NamedThreadLocal;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * 核心基于ThreadLocal的切换数据源工具类
@@ -43,6 +48,38 @@ public final class DynamicMongoDatabaseContextHolder {
     }
 
     /**
+     * 栈里最近一个非空的 instanceId。
+     * <p>
+     * 注解里没写 instanceId 表示「继承外层上下文」而不是「回落默认源」：例如外层方法切到 slave，
+     * 内层方法只声明了 databaseName，那么内层调用仍然应该用 slave 的客户端。
+     * </p>
+     *
+     * @return 最近的非空 instanceId，栈里没有则返回 null
+     */
+    public static String peekInstanceId() {
+        return peekFirst(DynamicMongoContext::getInstanceId);
+    }
+
+    /**
+     * 栈里最近一个非空的 database（语义同 {@link #peekInstanceId()}）。
+     *
+     * @return 最近的非空库名，栈里没有则返回 null
+     */
+    public static String peekDatabase() {
+        return peekFirst(DynamicMongoContext::getDatabase);
+    }
+
+    private static String peekFirst(Function<DynamicMongoContext, String> getter) {
+        for (DynamicMongoContext context : LOOKUP_KEY_HOLDER.get()) {
+            String value = getter.apply(context);
+            if (StringUtils.hasText(value)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
      * 设置当前线程数据源
      * <p>
      * 如非必要不要手动调用，调用后确保最终清除
@@ -69,6 +106,41 @@ public final class DynamicMongoDatabaseContextHolder {
         deque.poll();
         if (deque.isEmpty()) {
             LOOKUP_KEY_HOLDER.remove();
+        }
+    }
+
+    /**
+     * 当前线程上下文栈的快照（顺序为栈顶→栈底，即「最内层→最外层」），交给别的线程时可原样 {@link #restore(java.util.List)}。
+     * <p>
+     * 用途：把上下文手工传递到别的线程（例如包一层 {@code TaskDecorator}），因为本 holder 是 ThreadLocal，
+     * 不跨线程。
+     * </p>
+     *
+     * @return 不可变快照，当前线程没有上下文时返回空列表
+     */
+    public static List<DynamicMongoContext> snapshot() {
+        Deque<DynamicMongoContext> deque = LOOKUP_KEY_HOLDER.get();
+        if (deque.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(deque));
+    }
+
+    /**
+     * 用快照覆盖当前线程的上下文栈（传空列表等于清空）。
+     *
+     * @param contexts {@link #snapshot()} 的结果，或其它同序列表
+     */
+    public static void restore(List<DynamicMongoContext> contexts) {
+        Deque<DynamicMongoContext> deque = LOOKUP_KEY_HOLDER.get();
+        deque.clear();
+        if (contexts == null || contexts.isEmpty()) {
+            LOOKUP_KEY_HOLDER.remove();
+            return;
+        }
+        //push 是头插：倒着压才能让列表第一个元素位于栈顶
+        for (int i = contexts.size() - 1; i >= 0; i--) {
+            deque.push(contexts.get(i));
         }
     }
 

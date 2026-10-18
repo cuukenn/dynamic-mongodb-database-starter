@@ -4,6 +4,9 @@ name: Maven Central Repo Deployment
 on:
   release:
     types: [ released ]
+# 只读取仓库内容，凭据全部来自 secrets
+permissions:
+  contents: read
 # 定义一个发行任务
 jobs:
   publish:
@@ -14,7 +17,10 @@ jobs:
       # 1. 声明 checkout 仓库代码到工作区
       - name: Checkout Git Repo
         uses: actions/checkout@v4
-      # 2. 安装Java 环境 这里会用到的参数就是 Git Action secrets中配置的（Maven 仓库缓存由 setup-java 的 cache: maven 负责）
+      # 2. 安装 Java 环境
+      #    注意：setup-java 的 server-username / server-password / gpg-passphrase 收的是「环境变量名」而不是值，
+      #    它把名字写进 settings.xml 的 ${env.XXX} 占位符，真正的值在第 3 步用同名环境变量注入。
+      #    server-id 必须等于 pom 中 central-publishing-maven-plugin 的 publishingServerId（central）。
       - name: Setup JDK
         id: setup_jdk
         uses: actions/setup-java@v4
@@ -22,18 +28,16 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
           cache: maven
-          server-id: sonatype
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_TOKEN }}
-          gpg-passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-      # 3. 发布到Maven中央仓库
+          server-id: central
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          gpg-passphrase: OSSRH_GPG_SECRET_KEY_PASSWORD
+      # 3. 发布到 Maven 中央仓库（Central Portal）
+      #    pom 里 autoPublish=false：上传后产物会停在 Central Portal，需要人工点一次 Publish 才公开。
       - name: Publish to Maven Central Repo
-        # 这里用到了其他人写的action脚本，详细可以去看他的文档。
-        uses: samuelmeuli/action-maven-publish@v1
-        with:
-          maven_profiles: release
-          gpg_private_key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
-          gpg_passphrase: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-          nexus_username: ${{ secrets.OSSRH_USERNAME }}
-          nexus_password: ${{ secrets.OSSRH_TOKEN }}
-          server_id: sonatype
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          OSSRH_GPG_SECRET_KEY_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+        run: mvn -B -P release deploy

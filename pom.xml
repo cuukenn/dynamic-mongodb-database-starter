@@ -87,16 +87,6 @@
     <system>Github Issue</system>
     <url>https://github.com/cuukenn/dynamic-mongodb-database-starter/issues</url>
   </issueManagement>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>sonatype</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>sonatype</id>
-      <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <profiles>
     <profile>
       <id>release</id>
@@ -115,23 +105,37 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
           </plugin>
+          <!-- 发布走 Maven Central Portal：旧 OSSRH（s01.oss.sonatype.org）staging 已下线 -->
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>sonatype</id>
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+          <id>sonatype</id>
+          <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
     </profile>
   </profiles>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
+    <!--  原来这里有一段 <resources> 对 **/bootstrap*.yml 做 filtering、其余文件原样拷贝。
+          本模块 src/main/resources 下只有 META-INF（没有任何 yml），两段都等同于 Maven 默认行为，已删除；
+          将来真的需要在打包时替换变量，再加 <resources> 并同时补 .yml。  -->
     <pluginManagement>
       <plugins>
         <!--  javadoc-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.7.0</version>
           <configuration>
             <show>package</show>
             <tags>
@@ -171,7 +175,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.2.8</version>
           <configuration>
             <gpgArguments>
               <argument>--pinentry-mode</argument>
@@ -188,15 +192,17 @@
             </execution>
           </executions>
         </plugin>
+        <!--  Maven Central Portal 发布（取代已下线的 OSSRH staging） -->
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.13</version>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>0.12.0</version>
           <extensions>true</extensions>
           <configuration>
-            <serverId>sonatype</serverId>
-            <nexusUrl>https://ossrh-staging-api.central.sonatype.com/</nexusUrl>
-            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            <!-- settings.xml 里 id=central 的 server（Portal user token） -->
+            <publishingServerId>central</publishingServerId>
+            <!-- 与旧 autoReleaseAfterClose=false 同义：上传+校验后留在 Portal，人工点 Publish -->
+            <autoPublish>false</autoPublish>
           </configuration>
         </plugin>
       </plugins>

@@ -13,6 +13,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author changgg
@@ -29,8 +31,10 @@ public class SpElValueParser extends AbstractChainValueParser {
     /**
      * 解析上下文的模板
      */
+    private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>(16);
     private ParserContext parserContext = new TemplateParserContext();
     private BeanResolver beanResolver;
+    private ExpressionParser expressionParser = PARSER;
 
     @Override
     public boolean match(String value) {
@@ -44,22 +48,33 @@ public class SpElValueParser extends AbstractChainValueParser {
         ExpressionRootObject rootObject = new ExpressionRootObject(method, arguments, invocation.getThis());
         StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, arguments, NAME_DISCOVERER);
         context.setBeanResolver(beanResolver);
-        Expression expression;
-        if (parserContext != null) {
-            expression = PARSER.parseExpression(key, parserContext);
-        } else {
-            expression = PARSER.parseExpression(key);
-        }
+        Expression expression = expressionCache.computeIfAbsent(key, this::compileExpression);
         final Object value = expression.getValue(context);
         return value == null ? null : value.toString();
     }
 
+    /**
+     * 编译表达式。注解里的取值表达式是有限集合，编译结果可以安全缓存（实例级，含注解驱动的固定字符串）；
+     * EvaluationContext 绝不能缓存——它携带本次调用的 method/args/target。
+     */
+    private Expression compileExpression(String expressionString) {
+        return parserContext != null
+            ? expressionParser.parseExpression(expressionString, parserContext)
+            : expressionParser.parseExpression(expressionString);
+    }
+
     public void setParserContext(ParserContext parserContext) {
         this.parserContext = parserContext;
+        this.expressionCache.clear();
     }
 
     public void setBeanResolver(BeanResolver beanResolver) {
         this.beanResolver = beanResolver;
+    }
+
+    public void setExpressionParser(ExpressionParser expressionParser) {
+        this.expressionParser = expressionParser;
+        this.expressionCache.clear();
     }
 
     public static class ExpressionRootObject {
