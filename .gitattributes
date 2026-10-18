@@ -1,0 +1,13 @@
+# 行尾统一：仓库内一律存 LF，检出也一律 LF（与 .editorconfig 的 end_of_line = lf 一致）。
+# 历史原因 develop 分支上大量文件是 CRLF，改一个字符就会产生整文件 diff；从此按 LF 归一，不再制造行尾噪声。
+* text=auto eol=lf
+
+# 二进制文件不参与任何行尾/编码转换
+*.jar binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

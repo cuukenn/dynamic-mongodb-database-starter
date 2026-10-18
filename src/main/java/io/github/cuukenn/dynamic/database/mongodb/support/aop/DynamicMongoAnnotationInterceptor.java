@@ -8,6 +8,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * @author changgg
@@ -24,14 +25,22 @@ public class DynamicMongoAnnotationInterceptor implements MethodInterceptor {
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        final DynamicMongoContext context = DynamicMongoDatabaseContextHolder.push(determineDatabaseInstance(invocation));
-        if (logger.isDebugEnabled()) {
-            logger.debug("excepted dynamic mongodb instance is [{}]", context);
+        final DynamicMongoContext context = determineDatabaseInstance(invocation);
+        // 空上下文（注解没写任何值）代表「不切换」，不能 push：否则嵌套调用里会遮蔽外层的真实上下文
+        final boolean switched = context != null
+            && (StringUtils.hasText(context.getInstanceId()) || StringUtils.hasText(context.getDatabase()));
+        if (switched) {
+            DynamicMongoDatabaseContextHolder.push(context);
+            if (logger.isDebugEnabled()) {
+                logger.debug("excepted dynamic mongodb instance is [{}]", context);
+            }
         }
         try {
             return invocation.proceed();
         } finally {
-            DynamicMongoDatabaseContextHolder.poll();
+            if (switched) {
+                DynamicMongoDatabaseContextHolder.poll();
+            }
         }
     }
 

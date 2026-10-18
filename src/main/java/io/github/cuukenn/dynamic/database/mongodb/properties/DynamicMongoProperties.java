@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * @author changgg
  */
-@ConfigurationProperties(prefix = DynamicMongodbProperties.PREFIX)
-public class DynamicMongodbProperties {
+@ConfigurationProperties(prefix = DynamicMongoProperties.PREFIX)
+public class DynamicMongoProperties {
     public static final String PREFIX = "spring.data.mongodb.dynamic";
     private Map<String, MongoProperties> config;
     @NestedConfigurationProperty
